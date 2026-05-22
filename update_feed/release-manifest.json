@@ -2,7 +2,7 @@
   "version": "1.0.0",
   "channel": "stable",
   "minimumBlenderVersion": "4.2.0",
-  "url": "https://github.com/ikarus-nishant/delta-blender-bridge/releases/download/prod/r3f_live_preview_blender_v1.0.0.zip",
-  "sha256": "38577f9b234260085885fbae658df4c1e372b44a380fb60cfd65eaed1e6a6fba",
+  "url": "https://delta-blender-bridge-bridge.vercel.app/r3f_live_preview_blender_v1.0.0.zip",
+  "sha256": "e874090243de7ca29bf06d8fe5fc04508fc5efceb8058373edff738d231acd46",
   "releaseNotes": "Optional release notes text or URL"
 }

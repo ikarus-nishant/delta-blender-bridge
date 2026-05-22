@@ -13,6 +13,7 @@ function main() {
   const root = path.resolve(__dirname, "..");
   const packageJsonPath = path.join(root, "package.json");
   const manifestPath = path.join(root, "update_feed", "release-manifest.json");
+  const updateFeedDir = path.join(root, "update_feed");
   const distDir = path.join(root, "dist");
 
   const pkg = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
@@ -20,21 +21,22 @@ function main() {
   const version = pkg.version;
   const zipName = `r3f_live_preview_blender_v${version}.zip`;
   const zipPath = path.join(distDir, zipName);
+  const feedZipPath = path.join(updateFeedDir, zipName);
 
   if (!fs.existsSync(zipPath)) {
     throw new Error(`Release zip not found: ${zipPath}`);
   }
 
+  fs.copyFileSync(zipPath, feedZipPath);
+
   manifest.version = version;
   manifest.sha256 = sha256ForFile(zipPath);
 
-  const releaseUrl = process.env.R3F_LIVE_PREVIEW_RELEASE_URL;
-  if (releaseUrl) {
-    manifest.url = releaseUrl;
-  }
+  const releaseBaseUrl = process.env.R3F_LIVE_PREVIEW_RELEASE_BASE_URL || "https://delta-blender-bridge-bridge.vercel.app";
+  manifest.url = `${releaseBaseUrl.replace(/\/+$/, "")}/${zipName}`;
 
   fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
-  console.log(`Updated ${path.relative(root, manifestPath)} for ${zipName}`);
+  console.log(`Copied ${zipName} into update_feed and updated ${path.relative(root, manifestPath)}`);
 }
 
 try {

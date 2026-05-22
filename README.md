@@ -100,11 +100,12 @@ How to test the updater:
 
 During `npm run package:extension`, the packaging script now:
 - names the release zip from the root package version
+- copies the built zip into `update_feed/`
 - computes the zip SHA-256 automatically
-- patches [update_feed/release-manifest.json](E:/PROJECTS/blender-delta-bridge/update_feed/release-manifest.json) with the current `version` and `sha256`
+- patches [update_feed/release-manifest.json](E:/PROJECTS/blender-delta-bridge/update_feed/release-manifest.json) with the current `version`, `url`, and `sha256`
 
 Optional:
-- set `R3F_LIVE_PREVIEW_RELEASE_URL` before packaging if you also want the manifest `url` field patched automatically
+- set `R3F_LIVE_PREVIEW_RELEASE_BASE_URL` before packaging if you want a different hosted base URL than the default Vercel project
 
 ### Vercel hosting
 
