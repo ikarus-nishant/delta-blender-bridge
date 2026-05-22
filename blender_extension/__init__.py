@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .version import APP_VERSION_TUPLE, MIN_BLENDER_VERSION_TUPLE
+from .version import APP_VERSION_TUPLE, DEFAULT_UPDATE_FEED_URL, MIN_BLENDER_VERSION_TUPLE
 
 bl_info = {
     "name": "R3F Live Preview",
@@ -64,6 +64,8 @@ def register():
     addon = bpy.context.preferences.addons.get(__package__)
     if addon:
         preferences = addon.preferences
+        if not preferences.update_feed_url:
+            preferences.update_feed_url = DEFAULT_UPDATE_FEED_URL
         if preferences.auto_update_enabled and preferences.update_feed_url:
             bpy.app.timers.register(
                 lambda: start_background_update_check(preferences.update_feed_url, bpy.app.version[:3]) or None,

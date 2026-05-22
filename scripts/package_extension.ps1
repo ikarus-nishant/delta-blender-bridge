@@ -15,7 +15,9 @@ $staging = Join-Path $root "dist\\extension_package"
 $viewerDist = Join-Path $root "viewer\\dist"
 $bridgeDist = Join-Path $root "bridge\\dist"
 $extensionDir = Join-Path $staging "r3f_live_preview"
-$zipPath = Join-Path $root "dist\\r3f_live_preview_blender_v1.0.0.zip"
+$packageJson = Get-Content (Join-Path $root "package.json") | ConvertFrom-Json
+$version = $packageJson.version
+$zipPath = Join-Path $root ("dist\\r3f_live_preview_blender_v{0}.zip" -f $version)
 
 if (Test-Path $staging) {
     Remove-Item -LiteralPath $staging -Recurse -Force
@@ -30,4 +32,5 @@ Copy-Item -Path $viewerDist -Destination (Join-Path $extensionDir "viewer_dist")
 Copy-Item -Path $bridgeDist -Destination (Join-Path $extensionDir "bridge_dist") -Recurse
 
 Compress-Archive -Path (Join-Path $extensionDir "*") -DestinationPath $zipPath
+node (Join-Path $root "scripts\\update_release_manifest.cjs")
 Write-Host "Created package: $zipPath"

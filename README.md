@@ -80,6 +80,14 @@ How to test the updater:
 6. Click `Open Update Folder` to inspect the staged zip.
 7. Reinstall that downloaded zip manually in Blender to apply the update.
 
+During `npm run package:extension`, the packaging script now:
+- names the release zip from the root package version
+- computes the zip SHA-256 automatically
+- patches [update_feed/release-manifest.json](E:/PROJECTS/blender-delta-bridge/update_feed/release-manifest.json) with the current `version` and `sha256`
+
+Optional:
+- set `R3F_LIVE_PREVIEW_RELEASE_URL` before packaging if you also want the manifest `url` field patched automatically
+
 ### Vercel hosting
 
 A minimal Vercel-ready update feed is included in [update_feed/README.md](E:/PROJECTS/blender-delta-bridge/update_feed/README.md).

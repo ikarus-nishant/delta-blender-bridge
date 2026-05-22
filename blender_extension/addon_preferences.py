@@ -4,7 +4,7 @@ import bpy
 
 from .process_manager import has_node_runtime
 from .updater import UPDATE_STATE
-from .version import APP_VERSION
+from .version import APP_VERSION, DEFAULT_UPDATE_FEED_URL
 
 
 class R3FLivePreviewPreferences(bpy.types.AddonPreferences):
@@ -25,7 +25,7 @@ class R3FLivePreviewPreferences(bpy.types.AddonPreferences):
         items=[("stable", "Stable", "")],
         default="stable",
     )
-    update_feed_url: bpy.props.StringProperty(name="Update feed URL", default="")
+    update_feed_url: bpy.props.StringProperty(name="Update feed URL", default=DEFAULT_UPDATE_FEED_URL)
     viewer_tone_mapping: bpy.props.EnumProperty(
         name="Viewer tone mapping",
         items=[
