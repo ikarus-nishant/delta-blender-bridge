@@ -25,7 +25,7 @@ from .operators import (
 )
 from .panel import R3FLivePreviewPanel, R3FLivePreviewSceneProperties
 from .process_manager import has_node_runtime
-from .updater import load_state, start_background_update_check
+from .updater import load_state, mark_installed_build_if_ready, start_background_update_check
 
 
 CLASSES = (
@@ -59,6 +59,7 @@ def register():
         bpy.utils.register_class(cls)
     bpy.types.Scene.r3f_live_preview = bpy.props.PointerProperty(type=R3FLivePreviewSceneProperties)
     load_state()
+    mark_installed_build_if_ready()
     if not has_node_runtime():
         bpy.app.timers.register(_notify_missing_node, first_interval=1.0)
     addon = bpy.context.preferences.addons.get(__package__)

@@ -19,6 +19,7 @@ class UpdateState:
     update_available: bool = False
     pending_version: str = ""
     pending_sha256: str = ""
+    installed_sha256: str = ""
     downloaded_zip_path: str = ""
     last_checked: str = ""
     status_message: str = "No update check yet"
@@ -72,6 +73,7 @@ def load_state() -> None:
         with _LOCK:
             UPDATE_STATE.pending_version = payload.get("pending_version", "")
             UPDATE_STATE.pending_sha256 = payload.get("pending_sha256", "")
+            UPDATE_STATE.installed_sha256 = payload.get("installed_sha256", "")
             UPDATE_STATE.downloaded_zip_path = payload.get("downloaded_zip_path", "")
             UPDATE_STATE.last_checked = payload.get("last_checked", "")
             UPDATE_STATE.status_message = payload.get("status_message", UPDATE_STATE.status_message)
@@ -128,6 +130,8 @@ def _apply_manifest_result(manifest: dict, blender_version: tuple[int, int, int]
     minimum_blender_version = manifest.get("minimumBlenderVersion") or manifest.get("minBlenderVersion") or ""
     release_notes = manifest.get("releaseNotes") or manifest.get("releaseNotesUrl") or ""
     previous_latest_sha256 = UPDATE_STATE.latest_sha256
+    installed_sha256 = UPDATE_STATE.installed_sha256
+    pending_sha256 = UPDATE_STATE.pending_sha256
 
     with _LOCK:
         UPDATE_STATE.last_checked = _timestamp()
@@ -157,12 +161,17 @@ def _apply_manifest_result(manifest: dict, blender_version: tuple[int, int, int]
         save_state()
         return
 
-    same_version_new_build = latest_version == APP_VERSION and sha256.lower() != (previous_latest_sha256 or "").lower()
+    current_reference_sha256 = (installed_sha256 or pending_sha256 or previous_latest_sha256 or "").lower()
+    same_version_new_build = latest_version == APP_VERSION and sha256.lower() != current_reference_sha256
 
     if not is_newer_version(latest_version) and not same_version_new_build:
         with _LOCK:
-            UPDATE_STATE.status_message = f"Up to date ({APP_VERSION})"
-            UPDATE_STATE.update_available = bool(UPDATE_STATE.pending_version)
+            if latest_version == APP_VERSION and pending_sha256 and sha256.lower() == pending_sha256.lower():
+                UPDATE_STATE.status_message = f"Update build {latest_version} already staged locally"
+                UPDATE_STATE.update_available = True
+            else:
+                UPDATE_STATE.status_message = f"Up to date ({APP_VERSION})"
+                UPDATE_STATE.update_available = bool(UPDATE_STATE.pending_version)
         save_state()
         return
 
@@ -232,4 +241,21 @@ def clear_pending_update() -> None:
         UPDATE_STATE.pending_sha256 = ""
         UPDATE_STATE.downloaded_zip_path = ""
         UPDATE_STATE.status_message = f"Up to date ({APP_VERSION})"
+    save_state()
+
+
+def mark_installed_build_if_ready() -> None:
+    with _LOCK:
+        if (
+            UPDATE_STATE.pending_version == APP_VERSION
+            and UPDATE_STATE.pending_sha256
+            and UPDATE_STATE.downloaded_zip_path
+            and Path(UPDATE_STATE.downloaded_zip_path).exists()
+        ):
+            UPDATE_STATE.installed_sha256 = UPDATE_STATE.pending_sha256
+            UPDATE_STATE.pending_version = ""
+            UPDATE_STATE.pending_sha256 = ""
+            UPDATE_STATE.downloaded_zip_path = ""
+            UPDATE_STATE.update_available = False
+            UPDATE_STATE.status_message = f"Installed build registered for {APP_VERSION}"
     save_state()
