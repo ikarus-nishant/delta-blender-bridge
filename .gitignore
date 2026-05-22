@@ -3,7 +3,6 @@ dist/
 bridge/dist/
 viewer/dist/
 *.log
-*.zip
 .DS_Store
 Thumbs.db
 __pycache__/
