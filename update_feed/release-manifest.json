@@ -3,6 +3,6 @@
   "channel": "stable",
   "minimumBlenderVersion": "4.2.0",
   "url": "https://delta-blender-bridge-bridge.vercel.app/r3f_live_preview_blender_v1.0.0.zip",
-  "sha256": "e874090243de7ca29bf06d8fe5fc04508fc5efceb8058373edff738d231acd46",
+  "sha256": "0797b6c2018df0a5174b02fbaeeaf5a7d989f9b1623c662e74ce9c5eb372bdd2",
   "releaseNotes": "Optional release notes text or URL"
 }

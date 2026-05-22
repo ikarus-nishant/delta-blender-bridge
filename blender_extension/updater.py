@@ -12,6 +12,7 @@ from pathlib import Path
 
 from .version import APP_VERSION
 
+# Packaging note: harmless source-only marker to force a new extension zip hash for updater testing.
 
 @dataclass
 class UpdateState:
