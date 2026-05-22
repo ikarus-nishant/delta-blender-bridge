@@ -1,0 +1,22 @@
+{
+  "name": "r3f-live-preview-blender",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.12.3",
+  "workspaces": [
+    "bridge",
+    "viewer"
+  ],
+  "scripts": {
+    "build": "node ./scripts/run-workspace.cjs build",
+    "dev:viewer": "node ./scripts/run-workspace.cjs dev viewer",
+    "dev:bridge": "node ./scripts/run-workspace.cjs dev bridge",
+    "build:viewer": "node ./scripts/run-workspace.cjs build viewer",
+    "build:bridge": "node ./scripts/run-workspace.cjs build bridge",
+    "package:extension": "scripts\\package_extension.cmd"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0",
+    "postject": "^1.0.0-alpha.6"
+  }
+}

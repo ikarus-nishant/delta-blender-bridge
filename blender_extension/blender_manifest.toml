@@ -1,0 +1,22 @@
+schema_version = "1.0.0"
+
+id = "r3f_live_preview"
+version = "1.0.0"
+name = "R3F Live Preview"
+tagline = "Preview Blender models in a local React Three Fiber viewer"
+maintainer = "Ikarus Delta"
+type = "add-on"
+
+blender_version_min = "4.2.0"
+
+license = [
+  "SPDX:Proprietary"
+]
+
+platforms = [
+  "windows-x64"
+]
+
+[permissions]
+network = "Starts a localhost server to preview models in a browser"
+files = "Exports temporary GLB files and textures for local preview"

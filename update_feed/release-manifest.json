@@ -1,0 +1,8 @@
+{
+  "version": "1.0.1",
+  "channel": "stable",
+  "minimumBlenderVersion": "4.2.0",
+  "url": "https://your-download-host.example.com/r3f_live_preview_blender_v1.0.1.zip",
+  "sha256": "REPLACE_WITH_RELEASE_ZIP_SHA256",
+  "releaseNotes": "Optional release notes text or URL"
+}

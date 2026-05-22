@@ -1,0 +1,50 @@
+import { create } from "zustand";
+export const useLivePreviewStore = create((set) => ({
+    sessionId: null,
+    token: null,
+    connected: false,
+    modelUrl: null,
+    modelVersion: null,
+    loadState: "idle",
+    lastUpdateAt: null,
+    materialPatchCount: 0,
+    lastPatch: null,
+    lastError: null,
+    warnings: [],
+    materialCount: 0,
+    textureCount: 0,
+    triangleCount: 0,
+    environmentUrl: null,
+    toneMapping: "ACESFilmic",
+    camera: null,
+    cameraRevision: 0,
+    setSession: (sessionId, token) => set({ sessionId, token }),
+    setConnected: (connected) => set({ connected }),
+    setModel: (modelUrl, version) => set({
+        modelUrl,
+        modelVersion: version,
+        lastUpdateAt: Date.now(),
+    }),
+    setLoadState: (loadState, error) => set({
+        loadState,
+        lastError: error ?? null,
+    }),
+    registerPatch: (materialName, values) => set((state) => ({
+        materialPatchCount: state.materialPatchCount + 1,
+        lastPatch: { materialName, values },
+        lastUpdateAt: Date.now(),
+    })),
+    addWarning: (message) => set((state) => ({
+        warnings: [...state.warnings.slice(-7), { time: Date.now(), message }],
+        lastError: message,
+    })),
+    setSceneStats: (stats) => set(stats),
+    setEnvironmentConfig: (environmentUrl, toneMapping) => set({
+        environmentUrl,
+        toneMapping: toneMapping ?? "ACESFilmic",
+    }),
+    setCamera: (camera) => set((state) => ({
+        camera,
+        cameraRevision: state.cameraRevision + 1,
+    })),
+}));

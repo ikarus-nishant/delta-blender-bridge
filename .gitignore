@@ -1,0 +1,12 @@
+node_modules/
+dist/
+bridge/dist/
+viewer/dist/
+*.log
+*.zip
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+sessions/
+tmp/
