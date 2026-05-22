@@ -18,10 +18,12 @@ class UpdateState:
     checking: bool = False
     update_available: bool = False
     pending_version: str = ""
+    pending_sha256: str = ""
     downloaded_zip_path: str = ""
     last_checked: str = ""
     status_message: str = "No update check yet"
     latest_version: str = ""
+    latest_sha256: str = ""
     release_notes: str = ""
     error: str = ""
 
@@ -69,10 +71,12 @@ def load_state() -> None:
         payload = json.loads(path.read_text(encoding="utf-8"))
         with _LOCK:
             UPDATE_STATE.pending_version = payload.get("pending_version", "")
+            UPDATE_STATE.pending_sha256 = payload.get("pending_sha256", "")
             UPDATE_STATE.downloaded_zip_path = payload.get("downloaded_zip_path", "")
             UPDATE_STATE.last_checked = payload.get("last_checked", "")
             UPDATE_STATE.status_message = payload.get("status_message", UPDATE_STATE.status_message)
             UPDATE_STATE.latest_version = payload.get("latest_version", "")
+            UPDATE_STATE.latest_sha256 = payload.get("latest_sha256", "")
             UPDATE_STATE.release_notes = payload.get("release_notes", "")
             UPDATE_STATE.update_available = bool(UPDATE_STATE.pending_version)
     except Exception as error:  # noqa: BLE001
@@ -123,10 +127,12 @@ def _apply_manifest_result(manifest: dict, blender_version: tuple[int, int, int]
     sha256 = manifest.get("sha256", "")
     minimum_blender_version = manifest.get("minimumBlenderVersion") or manifest.get("minBlenderVersion") or ""
     release_notes = manifest.get("releaseNotes") or manifest.get("releaseNotesUrl") or ""
+    previous_latest_sha256 = UPDATE_STATE.latest_sha256
 
     with _LOCK:
         UPDATE_STATE.last_checked = _timestamp()
         UPDATE_STATE.latest_version = latest_version
+        UPDATE_STATE.latest_sha256 = sha256
         UPDATE_STATE.release_notes = release_notes
         UPDATE_STATE.error = ""
 
@@ -151,7 +157,9 @@ def _apply_manifest_result(manifest: dict, blender_version: tuple[int, int, int]
         save_state()
         return
 
-    if not is_newer_version(latest_version):
+    same_version_new_build = latest_version == APP_VERSION and sha256.lower() != (previous_latest_sha256 or "").lower()
+
+    if not is_newer_version(latest_version) and not same_version_new_build:
         with _LOCK:
             UPDATE_STATE.status_message = f"Up to date ({APP_VERSION})"
             UPDATE_STATE.update_available = bool(UPDATE_STATE.pending_version)
@@ -173,8 +181,12 @@ def _apply_manifest_result(manifest: dict, blender_version: tuple[int, int, int]
     with _LOCK:
         UPDATE_STATE.update_available = True
         UPDATE_STATE.pending_version = latest_version
+        UPDATE_STATE.pending_sha256 = sha256
         UPDATE_STATE.downloaded_zip_path = str(zip_path)
-        UPDATE_STATE.status_message = f"Update {latest_version} downloaded. Reinstall the staged zip on next restart."
+        if same_version_new_build:
+            UPDATE_STATE.status_message = f"Rebuilt package {latest_version} downloaded. Reinstall the staged zip to apply the new build."
+        else:
+            UPDATE_STATE.status_message = f"Update {latest_version} downloaded. Reinstall the staged zip on next restart."
     save_state()
 
 
@@ -217,6 +229,7 @@ def clear_pending_update() -> None:
     with _LOCK:
         UPDATE_STATE.update_available = False
         UPDATE_STATE.pending_version = ""
+        UPDATE_STATE.pending_sha256 = ""
         UPDATE_STATE.downloaded_zip_path = ""
         UPDATE_STATE.status_message = f"Up to date ({APP_VERSION})"
     save_state()

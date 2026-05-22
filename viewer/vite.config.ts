@@ -12,5 +12,17 @@ export default defineConfig({
   server: {
     host: "127.0.0.1",
     port: 4173,
+    proxy: {
+      "/assets": {
+        target: process.env.VITE_BRIDGE_PROXY_TARGET ?? "http://127.0.0.1:48731",
+      },
+      "/health": {
+        target: process.env.VITE_BRIDGE_PROXY_TARGET ?? "http://127.0.0.1:48731",
+      },
+      "/ws": {
+        target: process.env.VITE_BRIDGE_PROXY_TARGET ?? "http://127.0.0.1:48731",
+        ws: true,
+      },
+    },
   },
 });

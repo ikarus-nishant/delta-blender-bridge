@@ -16,6 +16,8 @@ class R3FLivePreviewPreferences(bpy.types.AddonPreferences):
     default_export_directory: bpy.props.StringProperty(name="Default export directory", subtype="DIR_PATH")
     browser_executable_path: bpy.props.StringProperty(name="Browser executable path", subtype="FILE_PATH")
     auto_open_browser: bpy.props.BoolProperty(name="Auto-open browser", default=True)
+    use_external_viewer: bpy.props.BoolProperty(name="Use external viewer", default=False)
+    external_viewer_url: bpy.props.StringProperty(name="External viewer URL", default="http://127.0.0.1:4173")
     material_patch_debounce_ms: bpy.props.IntProperty(name="Material patch debounce", default=100, min=50)
     glb_export_debounce_ms: bpy.props.IntProperty(name="GLB export debounce", default=750, min=100)
     production_hdri_path: bpy.props.StringProperty(name="Production HDRI path", subtype="FILE_PATH")
@@ -51,6 +53,9 @@ class R3FLivePreviewPreferences(bpy.types.AddonPreferences):
         layout.prop(self, "default_export_directory")
         layout.prop(self, "browser_executable_path")
         layout.prop(self, "auto_open_browser")
+        layout.prop(self, "use_external_viewer")
+        if self.use_external_viewer:
+            layout.prop(self, "external_viewer_url")
         layout.prop(self, "material_patch_debounce_ms")
         layout.prop(self, "glb_export_debounce_ms")
         layout.prop(self, "production_hdri_path")

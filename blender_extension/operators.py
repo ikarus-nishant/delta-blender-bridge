@@ -39,6 +39,13 @@ def _sync_environment_asset(prefs) -> str | None:
     return f"/assets/{SESSION.status.session_id}/{target.name}?v={int(time.time() * 1000)}"
 
 
+def _viewer_url(prefs, port: int) -> str:
+    if prefs.use_external_viewer:
+        base = (prefs.external_viewer_url or "http://127.0.0.1:4173").rstrip("/")
+        return f"{base}/?session={SESSION.status.session_id}&token={SESSION.status.token}"
+    return f"http://127.0.0.1:{port}/?session={SESSION.status.session_id}&token={SESSION.status.token}"
+
+
 class R3FPreviewStartOperator(bpy.types.Operator):
     bl_idname = "r3f_live_preview.start"
     bl_label = "Start Preview"
@@ -120,12 +127,13 @@ class R3FPreviewStartOperator(bpy.types.Operator):
             SESSION.last_material_snapshot = snapshot_materials([material for material in bpy.data.materials if material])
             register_handlers()
             SESSION.status.auto_sync_enabled = True
-            viewer_url = response["viewerUrl"]
+            viewer_url = _viewer_url(prefs, props.viewer_port)
             log_json(
                 logger,
                 "session_started",
                 {
                     "viewerUrl": viewer_url,
+                    "bridgeViewerUrl": response["viewerUrl"],
                     "environmentUrl": environment_url,
                     "toneMapping": prefs.viewer_tone_mapping,
                 },
@@ -215,7 +223,8 @@ class R3FOpenViewerOperator(bpy.types.Operator):
             return {"CANCELLED"}
 
         props = _props(context)
-        url = f"http://127.0.0.1:{props.viewer_port}/?session={SESSION.status.session_id}&token={SESSION.status.token}"
+        prefs = _prefs(context)
+        url = _viewer_url(prefs, props.viewer_port)
         webbrowser.open(url)
         return {"FINISHED"}
 

@@ -47,6 +47,24 @@ npm run package:extension
 - Bridge serves the bundled viewer and session assets from `127.0.0.1`.
 - Viewer connects over WebSocket and updates on full-model reloads or material patches.
 
+## Dev viewer override
+
+If you want Blender to open your Vite dev viewer instead of the bundled extension viewer:
+
+1. Run:
+
+```cmd
+npm run dev:viewer
+```
+
+2. In Blender add-on preferences:
+- enable `Use external viewer`
+- set `External viewer URL` to `http://127.0.0.1:4173`
+
+3. Click `Start Preview`
+
+The dev viewer proxies `/assets`, `/health`, and `/ws` back to the local bridge automatically.
+
 ## V1 updater
 
 The Blender add-on can now check a simple remote JSON manifest, download a newer extension zip into a local staging folder, and show that an update is ready.
